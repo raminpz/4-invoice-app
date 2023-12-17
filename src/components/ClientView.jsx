@@ -1,13 +1,18 @@
-import React from "react";
-
-const ClientView = ({title, client}) => {
-
-    const { name: nameClient, lastName, address } = client;
-    const { country, city, street, number } = address;
+import PropTypes from "prop-types";
+const ClientView = ({ title, client }) => {
+  const {
+    name: nameClient,
+    lastName,
+    address: { 
+      country, 
+      city, 
+      street, 
+      number },
+  } = client;
 
   return (
     <>
-      <h3>{ title }</h3>
+      <h3>{title}</h3>
       <ul className="list-group">
         <li className="list-group-item active">
           {nameClient} {lastName}
@@ -24,3 +29,7 @@ const ClientView = ({title, client}) => {
 };
 
 export default ClientView;
+ClientView.propTypes = {
+  title: PropTypes.string.isRequired,
+  client: PropTypes.object.isRequired,
+};
