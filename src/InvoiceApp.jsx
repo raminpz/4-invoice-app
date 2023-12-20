@@ -3,9 +3,10 @@ import ClientView from "./components/ClientView";
 import CompanyView from "./components/CompanyView";
 import InvoiceView from "./components/InvoiceView";
 import ListItemsView from "./components/ListItemsView";
+import TotalView from "./components/TotalView";
 
 const InvoiceApp = () => {
-  const { id, name, client, company, items } = getInvoice();
+  const { total, id, name, client, company, items } = getInvoice();
 
   return (
     <>
@@ -17,15 +18,39 @@ const InvoiceApp = () => {
 
             <div className="row my-3">
               <div className="col">
-                <ClientView title = "Datos del Cliente" client={client} />
+                <ClientView title="Datos del Cliente" client={client} />
               </div>
 
               <div className="col">
-                <CompanyView title = "Datos de la empresa" company={company} />
+                <CompanyView title="Datos de la empresa" company={company} />
               </div>
             </div>
 
-            <ListItemsView title="Productos de la Factura" items={items}/>
+            <ListItemsView title="Productos de la Factura" items={items} />
+            <TotalView total={total} />
+            <form >
+              <input
+                type="text"
+                name="product"
+                placeholder="Producto"
+                className="form-control m-3"
+                onChange={ event => console.log(event.target.value)}
+              />
+              <input
+                type="number"
+                name="preci"
+                placeholder="Precio"
+                className="form-control m-3"
+                onChange={ event => console.log(event.target.value)}
+              />
+              <input
+                type="number"
+                name="quantity"
+                placeholder="Cantidad"
+                className="form-control m-3"
+                onChange={ event => console.log(event.target.value)}
+              />
+            </form>
           </div>
         </div>
       </div>
