@@ -6,16 +6,71 @@ import InvoiceView from "./components/InvoiceView";
 import ListItemsView from "./components/ListItemsView";
 import TotalView from "./components/TotalView";
 
-
 const InvoiceApp = () => {
-  const { total, id, name, client, company, items: itemsInitial } = getInvoice();
+  const {
+    total,
+    id,
+    name,
+    client,
+    company,
+    items: itemsInitial,
+  } = getInvoice();
 
-  
-  const [productValue, setProductValue] = useState('');
-  const [priceValue, setPriceValue] = useState(0);
-  const [quantityValue, setQuantityValue] = useState(0);
+  const [productValue, setProductValue] = useState("");
+  const [priceValue, setPriceValue] = useState("");
+  const [quantityValue, setQuantityValue] = useState("");
 
   const [items, setItems] = useState(itemsInitial);
+
+  const [counter, setCounter] = useState(4);
+
+  const onProductChange = ({ target }) => {
+    console.log(target.value);
+    setProductValue(target.value);
+  };
+
+  const onPriceChange = ({ target }) => {
+    console.log(target.value);
+    setPriceValue(target.value);
+  };
+
+  const onQuantityChange = ({ target }) => {
+    console.log(target.value);
+    setQuantityValue(target.value);
+  };
+
+  const onInvoiceItemsSubmit = (event) => {
+    event.preventDefault();
+
+    if (productValue.trim().length <= 1) return;
+    if (priceValue.trim().length <= 1) {
+      alert("Error el precio no es un numero");
+      return;
+    }
+    if (isNaN(priceValue.trim())) return;
+    if (quantityValue.trim().length < 1) {
+      alert("Error la cantidad no es un numero");
+      return;
+    }
+    if (isNaN(quantityValue.trim())) {
+      alert("Error la cantidad no es un numero");
+      return;
+    }
+
+    setItems([
+      ...items,
+      {
+        id: counter,
+        product: productValue.trim(),
+        price: priceValue.trim(),
+        quantity: quantityValue.trim(),
+      },
+    ]);
+    setProductValue("");
+    setPriceValue("");
+    setQuantityValue("");
+    setCounter(counter + 1);
+  };
 
   return (
     <>
@@ -38,44 +93,35 @@ const InvoiceApp = () => {
             <ListItemsView title="Productos de la Factura" items={items} />
             <TotalView total={total} />
 
-
-            <form className="w-50" onSubmit={ event =>{
-              event.preventDefault();
-
-              setItems([...items, {key:4, product:productValue, price:priceValue, quantity:quantityValue}]);
-            }}>
+            <form className="w-50" onSubmit={onInvoiceItemsSubmit}>
               <input
                 type="text"
                 name="product"
+                value={productValue}
                 placeholder="Producto"
                 className="form-control m-3"
-                onChange={ event => {
-                  console.log(event.target.value);
-                  setProductValue(event.target.value);
-                }}
+                onChange={onProductChange}
               />
               <input
                 type="number"
                 name="preci"
+                value={priceValue}
                 placeholder="Precio"
                 className="form-control m-3"
-                onChange={ event => {
-                  console.log(event.target.value);
-                  setPriceValue(event.target.value);
-                }}
+                onChange={(event) => onPriceChange(event)}
               />
               <input
                 type="number"
+                value={quantityValue}
                 name="quantity"
                 placeholder="Cantidad"
                 className="form-control m-3"
-                onChange={ event => {
-                  console.log(event.target.value);
-                  setQuantityValue(event.target.value);
-                }}
+                onChange={onQuantityChange}
               />
 
-              <button type="submit" className="btn btn-primary">Crear Item</button>
+              <button type="submit" className="btn btn-primary m-3">
+                Nuevo Item
+              </button>
             </form>
           </div>
         </div>
