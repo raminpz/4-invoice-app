@@ -1,81 +1,83 @@
-import { useState } from "react";
-import { getInvoice } from "./services/getInvoice";
+import { useEffect, useState } from "react";
+import { getInvoice, calculateTotal } from "./services/getInvoice";
 import ClientView from "./components/ClientView";
 import CompanyView from "./components/CompanyView";
 import InvoiceView from "./components/InvoiceView";
 import ListItemsView from "./components/ListItemsView";
 import TotalView from "./components/TotalView";
+import FormItemsView from "./components/FormItemsView";
+
+const invoiceInitial = {
+  id: 0,
+  name: "",
+  client: {
+    name: "",
+    lastName: "",
+    address: {
+      country: "",
+      city: "",
+      street: "",
+      number: 0,
+    },
+  },
+  company: {
+    name: "",
+    fiscalNumber: 12345,
+  },
+  items: [],
+};
 
 const InvoiceApp = () => {
-  const {
-    total,
-    id,
-    name,
-    client,
-    company,
-    items: itemsInitial,
-  } = getInvoice();
 
-  const [productValue, setProductValue] = useState("");
-  const [priceValue, setPriceValue] = useState("");
-  const [quantityValue, setQuantityValue] = useState("");
+  const [ activeForm, setAtiveForm] = useState(false);
 
-  const [items, setItems] = useState(itemsInitial);
-
+  const [total, setTotal] = useState(0);
   const [counter, setCounter] = useState(4);
 
-  const onProductChange = ({ target }) => {
-    console.log(target.value);
-    setProductValue(target.value);
-  };
+  const [invoice, setInvoice] = useState(invoiceInitial);
 
-  const onPriceChange = ({ target }) => {
-    console.log(target.value);
-    setPriceValue(target.value);
-  };
+  const [items, setItems] = useState([]);
 
-  const onQuantityChange = ({ target }) => {
-    console.log(target.value);
-    setQuantityValue(target.value);
-  };
+  const { id, name, client, company } = invoice;
 
-  const onInvoiceItemsSubmit = (event) => {
-    event.preventDefault();
+  useEffect(() => {
+    const data = getInvoice();
+    console.log(data);
+    setInvoice(data);
+    setItems(data.items);
+  }, []);
 
-    if (productValue.trim().length <= 1) return;
-    if (priceValue.trim().length <= 1) {
-      alert("Error el precio no es un numero");
-      return;
-    }
-    if (isNaN(priceValue.trim())) return;
-    if (quantityValue.trim().length < 1) {
-      alert("Error la cantidad no es un numero");
-      return;
-    }
-    if (isNaN(quantityValue.trim())) {
-      alert("Error la cantidad no es un numero");
-      return;
-    }
+  useEffect(() => {
+    //console.log("El counter cambio!");
+  }, [counter]);
 
+  
+  useEffect(() => {
+    setTotal(calculateTotal(items));
+    //console.log("Los items cambiron!");
+  }, [items]);
+
+  const handerAddItems = ({product, price, quantity}) => {
     setItems([
       ...items,
       {
         id: counter,
-        product: productValue.trim(),
-        price: priceValue.trim(),
-        quantity: quantityValue.trim(),
+        product: product.trim(),
+        price: price.trim(),
+        quantity: quantity.trim(),
       },
     ]);
-    setProductValue("");
-    setPriceValue("");
-    setQuantityValue("");
     setCounter(counter + 1);
+  };
+
+  const onActiveForm = () =>{
+    setActiveForm(!activeForm);
   };
 
   return (
     <>
       <div className="container my-3">
-        <div className="card">
+        <div className="card my-3">
           <div className="card-header">Ejemplo Factura - Proyecto Final</div>
           <div className="card-body">
             <InvoiceView id={id} name={name} />
@@ -92,37 +94,9 @@ const InvoiceApp = () => {
 
             <ListItemsView title="Productos de la Factura" items={items} />
             <TotalView total={total} />
-
-            <form className="w-50" onSubmit={onInvoiceItemsSubmit}>
-              <input
-                type="text"
-                name="product"
-                value={productValue}
-                placeholder="Producto"
-                className="form-control m-3"
-                onChange={onProductChange}
-              />
-              <input
-                type="number"
-                name="preci"
-                value={priceValue}
-                placeholder="Precio"
-                className="form-control m-3"
-                onChange={(event) => onPriceChange(event)}
-              />
-              <input
-                type="number"
-                value={quantityValue}
-                name="quantity"
-                placeholder="Cantidad"
-                className="form-control m-3"
-                onChange={onQuantityChange}
-              />
-
-              <button type="submit" className="btn btn-primary m-3">
-                Nuevo Item
-              </button>
-            </form>
+            <button className="btn btn-secondary" onClick={onActiveForm}>{ !activeForm? 'Agregar Item' : 'Cerrar Form' }</button>
+            { !activeForm || <FormItemsView handler={handerAddItems}/>}
+            
           </div>
         </div>
       </div>
